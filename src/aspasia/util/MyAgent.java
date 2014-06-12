@@ -1,17 +1,17 @@
 package aspasia.util;
 
-import java.lang.instrument.*;
-import java.util.BitSet;
+import java.lang.instrument.Instrumentation;
 
 public class MyAgent {
+	private static volatile Instrumentation globalInstr;
+	
 	public static void premain(String args, Instrumentation inst) {
-		BitSet obj = new BitSet();
-		long size = inst.getObjectSize(obj);
-		System.out.println("Bytes used by object: " + size);
-		
-		
-		Boolean[] obj2 = new Boolean[0];
-		long size2 = inst.getObjectSize(obj2);
-		System.out.println("Bytes used by object2: " + size2);
+		globalInstr = inst;
 	}
+	
+	public static long getObjectSize(Object obj) {
+	    if (globalInstr == null)
+	      throw new IllegalStateException("Agent not initted");
+	    return globalInstr.getObjectSize(obj);
+	  }
 }
